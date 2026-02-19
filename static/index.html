@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>KrishiSahay - Speech Assistant</title>
+    <style>
+        body { font-family: Arial; background: #f0f9f0; padding: 20px; max-width: 600px; margin: auto; }
+        .card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        select, textarea, button { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; }
+        button { background: #2e7d32; color: white; font-weight: bold; border: none; cursor: pointer; }
+        button:disabled { background: #ccc; }
+        #answer { background: #e8f5e8; padding: 15px; border-left: 5px solid #2e7d32; margin-top: 20px; }
+        #status { color: #666; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🌾 KrishiSahay</h1>
+        <p>Ask your farming question by voice or text</p>
+
+        <label for="language">Choose language:</label>
+        <select id="language">
+            <option value="en">English</option>
+            <option value="hi">हिन्दी</option>
+            <option value="te">తెలుగు</option>
+            <option value="ta">தமிழ்</option>
+            <option value="kn">ಕನ್ನಡ</option>
+            <option value="ml">മലയാളം</option>
+            <option value="bn">বাংলা</option>
+            <option value="gu">ગુજરાતી</option>
+            <option value="mr">मराठी</option>
+            <option value="or">ଓଡ଼ିଆ</option>
+            <option value="as">অসমীয়া</option>
+            <!-- add more as needed -->
+        </select>
+
+        <button id="micBtn">🎤 Start Speaking</button>
+        <p id="status">Click the microphone and speak</p>
+
+        <textarea id="textInput" placeholder="Or type your question here..." rows="3"></textarea>
+        <button id="submitBtn">Ask KrishiSahay</button>
+
+        <div id="answer">
+            <strong>Answer will appear here</strong><br>
+            <button id="playBtn" disabled>🔊 Play Answer</button>
+        </div>
+    </div>
+
+    <script>
+        const langSelect = document.getElementById('language');
+        const micBtn = document.getElementById('micBtn');
+        const status = document.getElementById('status');
+        const textInput = document.getElementById('textInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const answerDiv = document.getElementById('answer');
+        const playBtn = document.getElementById('playBtn');
+
+        let recognition;
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+        } else if ('SpeechRecognition' in window) {
+            recognition = new SpeechRecognition();
+        } else {
+            alert('Your browser does not support speech recognition. Please use Chrome or Edge.');
+        }
+
+        if (recognition) {
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.onstart = () => {
+                status.innerText = '🎤 Listening...';
+                micBtn.disabled = true;
+            };
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                textInput.value = transcript;
+                status.innerText = '✅ Recognized. Click Ask to submit.';
+                micBtn.disabled = false;
+                // optionally auto-submit
+                // submitQuery(transcript);
+            };
+            recognition.onerror = (e) => {
+                status.innerText = '❌ Error: ' + e.error;
+                micBtn.disabled = false;
+            };
+            recognition.onend = () => {
+                micBtn.disabled = false;
+            };
+        }
+
+        micBtn.addEventListener('click', () => {
+            if (recognition) {
+                const lang = langSelect.value;
+                recognition.lang = lang === 'en' ? 'en-IN' : lang + '-IN'; // e.g., hi-IN, te-IN
+                recognition.start();
+            }
+        });
+
+        async function submitQuery(queryText) {
+            if (!queryText.trim()) return;
+            status.innerText = '⏳ Processing...';
+            answerDiv.innerHTML = '<strong>Answer will appear here</strong>';
+            playBtn.disabled = true;
+
+            const lang = langSelect.value;
+            const response = await fetch('http://localhost:5000/process', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: queryText, lang: lang })
+            });
+            const data = await response.json();
+            answerDiv.innerHTML = `<strong>Answer:</strong> ${data.answer}`;
+            status.innerText = '✅ Done.';
+            playBtn.disabled = false;
+            window.currentAnswer = data.answer;
+            window.currentLang = data.lang;
+        }
+
+        submitBtn.addEventListener('click', () => {
+            submitQuery(textInput.value);
+        });
+
+        // Play answer using browser's speech synthesis
+        playBtn.addEventListener('click', () => {
+            if (!window.currentAnswer) return;
+            const utterance = new SpeechSynthesisUtterance(window.currentAnswer);
+            // Try to set language for better voice
+            utterance.lang = window.currentLang === 'en' ? 'en-IN' : window.currentLang + '-IN';
+            speechSynthesis.speak(utterance);
+        });
+    </script>
+</body>
+</html>

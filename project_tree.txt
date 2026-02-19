@@ -1,0 +1,33 @@
+.
+├── app.py
+├── app_dynamic.py
+├── config
+│   └── settings.py
+├── data
+│   └── kcc_qa_pairs.json
+├── embeddings
+│   ├── faiss_index.pkl
+│   └── kcc_embeddings.pkl
+├── list_models.py
+├── pages
+├── project_tree.txt
+├── requirements.txt
+├── speech_app.py
+├── static
+│   └── index.html
+├── test_combined.py
+├── test_embeddings_full.py
+├── test_gemini.py
+├── test_rag_with_llm.py
+├── test_search.py
+├── utils
+│   ├── dynamic_translator.py
+│   ├── embedding_generator.py
+│   ├── gemini_llm.py
+│   ├── groq_llm.py
+│   ├── rag_engine.py
+│   ├── watsonx_llm.py
+│   └── weather_agent.py
+└── verify_all_components.py
+
+7 directories, 24 files

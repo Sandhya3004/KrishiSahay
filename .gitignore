@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Streamlit secrets
+.streamlit/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Optional: large data/embeddings if you don't want to include them
+# embeddings/*.pkl
+# data/*.csv

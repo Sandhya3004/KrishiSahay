@@ -1,0 +1,79 @@
+[
+  {
+    "question": "सरसों में माहू कीट का नियंत्रण कैसे करें?",
+    "answer": "श्रीमान जी सरसों की फसल में माहू कीट के नियंत्रण के लिए - Dimethoate 30% EC 300 ml प्रति एकड़ 150 लीटर पानी के साथ घोलकर छिड़काव करें। वैकल्पिक रूप से, इमिडाक्लोफिड 17.8 SL 100 ml को 200 लीटर पानी में मिलाकर प्रति एकड़ छिड़काव करें। छिड़काव सुबह या शाम के समय करें जब हवा की गति कम हो।",
+    "crop": "सरसों",
+    "category": "कीट प्रबंधन",
+    "language": "hi"
+  },
+  {
+    "question": "How to control aphids in mustard?",
+    "answer": "For control of aphids in mustard crop - Spray Dimethoate 30% EC 300 ml per acre mixed in 150 liters of water. Alternatively, use Imidacloprid 17.8 SL 100 ml per acre mixed in 200 liters of water. Spray during morning or evening hours when wind speed is low.",
+    "crop": "Mustard",
+    "category": "Pest Management",
+    "language": "en"
+  },
+  {
+    "question": "मूंग की बुवाई का सही समय क्या है?",
+    "answer": "मूंग की बुवाई के लिए उपयुक्त समय 10 मार्च से 10 अप्रैल तक है। गर्मी की फसल के लिए यह सबसे अच्छा समय होता है। बुवाई में देर करने से फल एवं फलियां गर्म हवा के कारण तथा वर्षा होने से क्षति हो सकती है। तराई क्षेत्र में मूंग की बुवाई मार्च के अन्दर कर लेनी चाहियें।",
+    "crop": "मूंग",
+    "category": "बुवाई",
+    "language": "hi"
+  },
+  {
+    "question": "When to sow moong?",
+    "answer": "The suitable time for sowing moong is from March 10 to April 10. This is the best time for summer crop. Late sowing may damage fruits and pods due to hot winds and rain. In foothill areas, moong should be sown within March.",
+    "crop": "Moong",
+    "category": "Sowing",
+    "language": "en"
+  },
+  {
+    "question": "गेहूं में फूल आने पर कौन सी खाद डालें?",
+    "answer": "गेहूं की फसल में फूल आने के समय, NPK 18:18:18 500 ग्राम प्रति 200 लीटर पानी में घोल बनाकर छिड़काव करें। यूरिया का प्रयोग 2 किलो प्रति एकड़ की दर से कर सकते हैं। ध्यान रखें कि खाद डालने के तुरंत बाद सिंचाई करें।",
+    "crop": "गेहूं",
+    "category": "उर्वरक",
+    "language": "hi"
+  },
+  {
+    "question": "What fertilizer for wheat during flowering?",
+    "answer": "During flowering in wheat crop, spray NPK 18:18:18 500 gm mixed in 200 liters of water per acre. You can also use Urea at 2 kg per acre. Ensure irrigation immediately after fertilizer application.",
+    "crop": "Wheat",
+    "category": "Fertilizer",
+    "language": "en"
+  },
+  {
+    "question": "आलू में पछेती झुलसा रोग का इलाज?",
+    "answer": "आलू में पछेती झुलसा रोग के नियंत्रण के लिए - मैंकोजेब 75% WP 500 ग्राम या क्लोरोथालोनिल 400 मिली प्रति एकड़ 150-200 लीटर पानी में घोलकर छिड़काव करें। छिड़काव 10-15 दिन के अंतराल पर दोहराएं। रोग के लक्षण दिखते ही पहला छिड़काव करें।",
+    "crop": "आलू",
+    "category": "रोग प्रबंधन",
+    "language": "hi"
+  },
+  {
+    "question": "How to treat blight in potato?",
+    "answer": "For control of late blight in potato - Spray Mancozeb 75% WP 500 gm or Chlorothalonil 400 ml per acre mixed in 150-200 liters of water. Repeat spray at 10-15 days interval. Apply first spray as soon as symptoms appear.",
+    "crop": "Potato",
+    "category": "Disease Management",
+    "language": "en"
+  },
+  {
+    "question": "PM किसान सम्मान निधि योजना के लिए आवेदन कैसे करें?",
+    "answer": "प्रधानमंत्री किसान सम्मान निधि योजना के लिए आप www.pmkisan.gov.in पर जाकर ऑनलाइन आवेदन कर सकते हैं। 'फार्मर कॉर्नर' में जाकर 'नया पंजीकरण' विकल्प चुनें। आधार कार्ड, बैंक पासबुक, भूमि दस्तावेज आवश्यक हैं। आप नजदीकी किसान सेवा केंद्र पर भी संपर्क कर सकते हैं।",
+    "crop": "सामान्य",
+    "category": "सरकारी योजना",
+    "language": "hi"
+  },
+  {
+    "question": "How to apply for PM Kisan Samman Nidhi?",
+    "answer": "For PM Kisan Samman Nidhi scheme, you can apply online at www.pmkisan.gov.in. Go to 'Farmer Corner' and select 'New Registration'. Aadhaar card, bank passbook, land documents are required. You can also contact nearest CSC (Common Service Centre).",
+    "crop": "General",
+    "category": "Government Scheme",
+    "language": "en"
+  },
+  {
+    "question": "कपास में सफेद मक्खी का नियंत्रण?",
+    "answer": "कपास में सफेद मक्खी के नियंत्रण के लिए - एसीटामिप्रिड 20% SP 60 ग्राम या इमिडाक्लोफिड 17.8 SL 100 मिली प्रति एकड़ 150 लीटर पानी में मिलाकर छिड़काव करें। नीम तेल 2% (20 मिली प्रति लीटर पानी) का भी प्रयोग कर सकते हैं। कीट की नियमित निगरानी करें।",
+    "crop": "कपास",
+    "category": "कीट प्रबंधन",
+    "language": "hi"
+  }
+]
