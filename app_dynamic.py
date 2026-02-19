@@ -15,11 +15,15 @@ from pathlib import Path
 sys.path.append('utils')
 
 # Import modules
+from utils.voice import voice_component
+import streamlit.components.v1 as components
 from dynamic_translator import get_translator, translate_text_cached
 from rag_engine import RAGEngine
 from gemini_llm import GeminiLLM
 
 from weather_agent import WeatherAgent
+from utils.db import init_db
+init_db()   # creates table if needed
 
 # Page configuration
 st.set_page_config(
@@ -527,6 +531,7 @@ elif st.session_state.page == 2:
         elif not st.session_state.selected_district:
             st.error(_("Please select a valid district"))
         else:
+            # Update session state
             st.session_state.farmer_name = name
             st.session_state.mobile = mobile
             st.session_state.email = email
@@ -535,6 +540,11 @@ elif st.session_state.page == 2:
             st.session_state.crop = crop
             st.session_state.selected_district = st.session_state.selected_district
             st.session_state.selected_crop = crop
+
+            # Save to PostgreSQL
+            from utils.db import save_farmer
+            save_farmer(name, mobile, email, st.session_state.selected_state,
+                        st.session_state.selected_district, crop)
             st.session_state.page = 3
             st.rerun()
 # ============================================
@@ -615,13 +625,89 @@ else:
                 if st.button(q, key=f"quick_{i}", use_container_width=True):
                     st.session_state.quick_query = q
         
-        # Question input
+        # ===== Voice Input Section =====
+        st.markdown("### 🎤 " + _("Voice Input"))
+        
+        # Microphone button HTML
+        mic_html = """
+        <div style="text-align: center; margin: 10px 0;">
+            <button id="mic-button" style="
+                background: #2e7d32;
+                color: white;
+                border: none;
+                border-radius: 50px;
+                padding: 10px 20px;
+                font-size: 16px;
+                cursor: pointer;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            ">
+                🎤 Speak
+            </button>
+            <p id="mic-status" style="color: #666; margin-top: 5px;"></p>
+        </div>
+        <script>
+        const mic = document.getElementById('mic-button');
+        const status = document.getElementById('mic-status');
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            status.innerText = '❌ Not supported';
+            mic.disabled = true;
+        } else {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            mic.onclick = () => {
+                recognition.lang = '""" + st.session_state.language + """-IN';
+                recognition.start();
+                status.innerText = '🎤 Listening...';
+                mic.disabled = true;
+            };
+            recognition.onresult = (e) => {
+                const text = e.results[0][0].transcript;
+                status.innerText = '✅ Done';
+                // Find the text input with key 'voice_transcript'
+                const inputs = document.querySelectorAll('input[type="text"]');
+                for (let input of inputs) {
+                    if (input.id && input.id.includes('voice_transcript')) {
+                        input.value = text;
+                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                        break;
+                    }
+                }
+                mic.disabled = false;
+            };
+            recognition.onerror = (e) => {
+                status.innerText = '❌ Error: ' + e.error;
+                mic.disabled = false;
+            };
+            recognition.onend = () => { mic.disabled = false; };
+        }
+        </script>
+        """
+        import streamlit.components.v1 as components
+        components.html(mic_html, height=120)
+
+        # Visible text input for the transcript
+        voice_text = st.text_input(
+            label="VoiceTranscript",
+            key="voice_transcript",
+            placeholder=_("Speak and the text will appear here")
+        )
+
+        # Button to transfer voice text to main question area
+        if st.button(_("📝 Use voice text as question")):
+            if voice_text:
+                st.session_state.main_question = voice_text
+                st.rerun()
+
+        # Main question input
         question = st.text_area(
             label=_("Your Question"),
             placeholder=_("e.g., How to control pests in mustard?"),
             height=100,
-            key="question_input",
-            label_visibility="collapsed"
+            key="main_question",
+            label_visibility="collapsed",
+            value=st.session_state.get('main_question', '')
         )
         
         # Ask button
@@ -635,7 +721,6 @@ else:
                     st.session_state.show_answer = True
         
         # Display answer and listen button
-                # Display answer and listen button
         if st.session_state.get('show_answer', False):
             st.markdown(f"### 📋 {_('Answer')}")
             answer_text = st.session_state.last_response  # already in target language
@@ -648,21 +733,19 @@ else:
             </div>
             """, unsafe_allow_html=True)
             
-            # Listen button
+            # Listen button (as before)
             if st.button(_("🔊 Listen")):
                 if st.session_state.last_response:
                     with st.spinner(_("Generating audio...")):
                         from gtts import gTTS
                         import io
                         import base64
-                        # Language code mapping for TTS
                         lang_map = {
-                            'en': 'en', 'hi': 'hi', 'te': 'te', 'ta': 'ta', 'kn': 'kn',
-                            'ml': 'ml', 'bn': 'bn', 'mr': 'mr', 'gu': 'gu',
-                            'pa': 'pa', 'or': 'or', 'as': 'as'
+                            'en':'en', 'hi':'hi', 'te':'te', 'ta':'ta', 'kn':'kn',
+                            'ml':'ml', 'bn':'bn', 'mr':'mr', 'gu':'gu',
+                            'pa':'pa', 'or':'or', 'as':'as'
                         }
                         tts_lang = lang_map.get(st.session_state.language, 'hi')
-                        # Use the already translated answer text
                         tts = gTTS(text=answer_text, lang=tts_lang, slow=False)
                         fp = io.BytesIO()
                         tts.write_to_fp(fp)

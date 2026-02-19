@@ -35,27 +35,71 @@ class WeatherAgent:
         self.default_climate = {"temp_range": (22, 34), "humidity_range": (40, 70), "conditions": ["clear sky", "few clouds", "haze"]}
 
     def get_weather(self, location):
-        try:
-            if self.api_key:
-            # Try real API
-                data = self._get_real_weather(location)
-                if data is not None:
-                    return data
-        # Fallback to mock
+        """Return weather data – real API if key present, else realistic mock."""
+        if self.api_key:
+            try:
+                return self._get_real_weather(location)
+            except Exception as e:
+                print(f"Real weather API failed: {e}. Falling back to mock.")
+                return self._get_mock_weather(location)
+        else:
             return self._get_mock_weather(location)
-        except Exception as e:
-            print(f"Weather error: {e}")
-        # Return a minimal dict with error flag
-            return {
-            "location": location,
-            "error": True,
-            "current": {"temp": 25, "humidity": 60, "description": "Data unavailable", "wind_speed": 0, "rain": 0},
-            "forecast": []
-        }
 
     def _get_real_weather(self, location):
-        # (Your existing real API code – unchanged)
-        pass  # Keep your existing implementation
+        """Fetch real weather data from OpenWeatherMap."""
+        # Current weather
+        current_url = f"{self.base_url}/weather"
+        current_params = {
+            "q": f"{location},IN",
+            "appid": self.api_key,
+            "units": "metric"
+        }
+        current_resp = requests.get(current_url, params=current_params, timeout=10)
+        current_resp.raise_for_status()
+        current_data = current_resp.json()
+
+        # 5-day forecast (3-hour intervals) – we'll take next 4 entries (~12 hours)
+        forecast_url = f"{self.base_url}/forecast"
+        forecast_params = {
+            "q": f"{location},IN",
+            "appid": self.api_key,
+            "units": "metric",
+            "cnt": 8   # 8 intervals = 24 hours
+        }
+        forecast_resp = requests.get(forecast_url, params=forecast_params, timeout=10)
+        forecast_resp.raise_for_status()
+        forecast_data = forecast_resp.json()
+
+        # Parse current
+        weather = current_data["weather"][0]["description"]
+        temp = current_data["main"]["temp"]
+        humidity = current_data["main"]["humidity"]
+        wind_speed = current_data["wind"]["speed"]
+        rain = current_data.get("rain", {}).get("1h", 0)
+
+        # Parse forecast (next 4 entries ~12 hours)
+        forecast = []
+        for item in forecast_data["list"][:4]:
+            forecast.append({
+                "time": item["dt_txt"],
+                "temp": item["main"]["temp"],
+                "humidity": item["main"]["humidity"],
+                "description": item["weather"][0]["description"],
+                "rain": item.get("rain", {}).get("3h", 0)
+            })
+
+        return {
+            "location": location,
+            "current": {
+                "temp": temp,
+                "humidity": humidity,
+                "description": weather,
+                "wind_speed": wind_speed,
+                "rain": rain
+            },
+            "forecast": forecast,
+            "is_mock": False
+        }
 
     def _get_mock_weather(self, location):
         """Return location‑specific mock weather, consistent for each call."""
@@ -63,7 +107,6 @@ class WeatherAgent:
         climate = self.location_climate.get(location, self.default_climate)
         
         # Generate values within the typical range (deterministic based on location + today's date)
-        # Use a seed so same location gives same weather for the same day (but changes daily)
         seed = hash(f"{location}_{datetime.now().strftime('%Y%m%d')}")
         random.seed(seed)
         
